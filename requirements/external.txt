@@ -1,0 +1,4 @@
+#MAPPING PDBs WITH PFAM IDs
+ftp://ftp.ebi.ac.uk/pub/databases/Pfam/mappings/pdb_pfam_mapping.txt
+#LIST OF PDB ENTRIES WITH CO-CRISTALYZATE LIGANDS
+http://www.ebi.ac.uk/thornton-srv/databases/pdbsum/data/lig_pairs.lst
