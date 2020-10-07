@@ -28,15 +28,23 @@ def moad_parse(input_file):
         resid=line_split[3].split(":")[2]
         status=line_split[4]
         if line_split[7] !="":
-            afinity=toMolar.toMolar(float(line_split[7]),line_split[8])
+            afinity_standard=line_split[7]+line_split[8]
+            afinity = toMolar.toMolar(float(line_split[7]),line_split[8])
+            type_afinity=line_split[5]
+            standard_relation=line_split[6]
         else:
             afinity="None"
+            afinity_standard="None"
+            type_afinity="None"
+            standard_relation="None"
 
         if compound not in compound_dict.keys():
             compound_dict[compound]= { "pdbs": [] }
             record = { "name": pdb, "residues": []  }
-            residues = {"chain": chain, "resid" : resid, "status": status, "afinity": afinity}
-            
+            if type_afinity=="None":
+                residues = {"chain": chain, "resid" : resid, "status": status, "standard_value": afinity, "standard_relation": standard_relation}
+            else:
+                residues = {"chain": chain, "resid" : resid, "status": status, "standard_value": afinity, type_afinity:afinity_standard, "standard_relation": standard_relation}
             record["residues"].append(residues)
             compound_dict[compound]["pdbs"].append(record)
 
@@ -44,11 +52,17 @@ def moad_parse(input_file):
             check=0
             for element in compound_dict[compound]["pdbs"]:
                 if pdb == element["name"]:
-                    residues = {"chain": chain, "resid" : resid, "status": status, "afinity": afinity}
+                    if type_afinity=="None":
+                        residues = {"chain": chain, "resid" : resid, "status": status, "standard_value": afinity, "standard_relation": standard_relation}
+                    else:
+                        residues = {"chain": chain, "resid" : resid, "status": status, "standard_value": afinity, type_afinity:afinity_standard, "standard_relation": standard_relation}
                     element["residues"].append(residues)
                     check=1
             if check==0:
-                residues = {"chain": chain, "resid" : resid, "status": status, "afinity": afinity}
+                if type_afinity=="None":
+                    residues = {"chain": chain, "resid" : resid, "status": status, "standard_value": afinity, "standard_relation": standard_relation}
+                else:
+                    residues = {"chain": chain, "resid" : resid, "status": status, "standard_value": afinity, type_afinity:afinity_standard, "standard_relation": standard_relation}
                 record = { "name": pdb, "residues": []  }
                 record["residues"].append(residues)
                 compound_dict[compound]["pdbs"].append(record)
