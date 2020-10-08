@@ -8,3 +8,8 @@ response = requests.get('https://api.github.com')
 print(response)   
 # print json content 
 print(response.json()) 
+#POST
+pload = '1cbs,1bgj'
+r = requests.post('https://www.ebi.ac.uk/pdbe/api/pdb/entry/ligand_monomers/',data = pload)
+print(r.json())
+

@@ -34,7 +34,7 @@ def pdb_bind(input_file):
                 valor_unidad=valor[-2:]
                 valor_Molar=toMolar.toMolar(valor_valor,valor_unidad)
 
-                record =  {  "name": PDB, "affinity": { medida:valor_Molar, "standard_relation":standard_relation}  }
+                record =  {  "name": PDB, "affinity": { medida:valor, "standard_relation":standard_relation, "standard_value":valor_Molar }  }
                 if multiple_ligands:
                     record["co_ligand"]={"relationship":multiple_ligands, "ligand":
                     (ligands[0] if ligands[0] != compound else ligands[1])}
