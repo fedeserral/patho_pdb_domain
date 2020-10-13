@@ -1,11 +1,10 @@
 import request_ligand_from_PDBe
 import json
 
+# Parseo el archivo de pdb_pfam_mapping.txt" en un diccionario, key:pdbs, valor los pfam y sus posiciones
 entrada=open("pdb_pfam_mapping.txt")
 lines=entrada.readlines()
-
 pdb_dictionary={}
-
 for line in lines[1:]:
     line=line.split("\t")
     pdb=line[0]
@@ -19,12 +18,12 @@ for line in lines[1:]:
         list_aux.append((pfam,chain,position))
         pdb_dictionary[pdb]=list_aux
 
+# Busco los ligandos y su posicion por pdb en PDBe. Busco los dominios y su posicion en pdb_pfam_mapping.txt.
+# Cruzo los datos para saber que ligandos de un pdb caen en el dominio de ese pdb por posicion y cadena.
 f='5OF4'
 e='5LL9 6AQH 5TY9 5L0A 5N63 5WBM 5VD3 5IXV 5VHS 5XTR 5M3A 5O4E 5MYI 5MFN 5WRJ 5VSH 5X7O 5GS7 5M7M 5U4G'
 PDBe_dic=(request_ligand_from_PDBe.ligands_from_pdbs(e))
-
 pfam_pdb_ligand_dic={}
-
 for pdb in PDBe_dic.keys():
     pdb_pfam_list=pdb_dictionary[pdb]
     PDBe_ligand_list=PDBe_dic[pdb]
@@ -40,5 +39,5 @@ for pdb in PDBe_dic.keys():
             pfam_position_final=int(pfam_position.split("-")[1])
             if ligand_chain == pfam_chain and ligand_position>pfam_position_inicio and ligand_position<pfam_position_final:
                 #ligand_dic={"ligand_id":ligand_id,"chain":ligand_chain, "position": ligand_position}
-                print(pfam_id,pfam_chain,pfam_position,pdb,ligand_id,ligand_chain,ligand_position)
+                print(pdb,pfam_id,pfam_chain,pfam_position,ligand_id,ligand_chain,ligand_position)
 #print(json.dumps(pfam_pdb_ligand_dic, indent=4, sort_keys=True))
