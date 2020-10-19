@@ -70,5 +70,5 @@ for pfam in pfam_entry:
                 if ligand["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
                     print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,ligand["chain_id"],posicion_ligando)
         except:
-            #Si no esta ese pdb en PDBe
+            #Si no esta ese pdb en el dicionario de PDBe
             continue
