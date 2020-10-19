@@ -1,43 +1,74 @@
 import request_ligand_from_PDBe
 import json
 
-# Parseo el archivo de pdb_pfam_mapping.txt" en un diccionario, key:pdbs, valor los pfam y sus posiciones
+# Parseo el archivo de pdb_pfam_mapping.txt" en un diccionario, key:pfam, valor los pdb y sus posiciones
+
 entrada=open("pdb_pfam_mapping.txt")
 lines=entrada.readlines()
-pdb_dictionary={}
+pfam_pdbs_dictionary={}
 for line in lines[1:]:
     line=line.split("\t")
     pdb=line[0]
     chain=line[1]
-    position=line[2]+"-"+line[3]
+    position=line[2]+","+line[3]
     pfam=line[4].split(".")[0]
-    if pdb not in pdb_dictionary.keys():
-        pdb_dictionary[pdb]=[(pfam,chain,position)]
+    if pfam not in pfam_pdbs_dictionary.keys():
+        pfam_pdbs_dictionary[pfam]=[(pdb,chain,position)]
     else:
-        list_aux=pdb_dictionary[pdb]
-        list_aux.append((pfam,chain,position))
-        pdb_dictionary[pdb]=list_aux
+        list_aux=pfam_pdbs_dictionary[pfam]
+        list_aux.append((pdb,chain,position))
+        pfam_pdbs_dictionary[pfam]=list_aux
 
-# Busco los ligandos y su posicion por pdb en PDBe. Busco los dominios y su posicion en pdb_pfam_mapping.txt.
-# Cruzo los datos para saber que ligandos de un pdb caen en el dominio de ese pdb por posicion y cadena.
-f='5OF4'
-e='5LL9 6AQH 5TY9 5L0A 5N63 5WBM 5VD3 5IXV 5VHS 5XTR 5M3A 5O4E 5MYI 5MFN 5WRJ 5VSH 5X7O 5GS7 5M7M 5U4G'
-PDBe_dic=(request_ligand_from_PDBe.ligands_from_pdbs(e))
-pfam_pdb_ligand_dic={}
-for pdb in PDBe_dic.keys():
-    pdb_pfam_list=pdb_dictionary[pdb]
-    PDBe_ligand_list=PDBe_dic[pdb]
-    for ligand_data in PDBe_ligand_list:
-        ligand_id=ligand_data[0]
-        ligand_chain=ligand_data[3]
-        ligand_position=ligand_data[4]
-        for pfam_data in pdb_pfam_list:
-            pfam_id=pfam_data[0]
-            pfam_chain=pfam_data[1]
-            pfam_position=pfam_data[2]
-            pfam_position_inicio=int(pfam_position.split("-")[0])
-            pfam_position_final=int(pfam_position.split("-")[1])
-            if ligand_chain == pfam_chain and ligand_position>pfam_position_inicio and ligand_position<pfam_position_final:
-                #ligand_dic={"ligand_id":ligand_id,"chain":ligand_chain, "position": ligand_position}
-                print(pdb,pfam_id,pfam_chain,pfam_position,ligand_id,ligand_chain,ligand_position)
-#print(json.dumps(pfam_pdb_ligand_dic, indent=4, sort_keys=True))
+#pfam_entry=['PF16203','PF04851','PF06777']
+pfam_entry=list(pfam_pdbs_dictionary.keys())[10:15]
+
+all_pdbs_of_pfams=[]
+for pfam in pfam_entry:
+    pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
+    all_pdbs_of_pfams=all_pdbs_of_pfams+pdbs_of_pfam_list
+
+pdbs_of_pfam=[pdb[0] for pdb in all_pdbs_of_pfams]
+print(len(pdbs_of_pfam))
+pdbs_of_pfam=list(set(pdbs_of_pfam))
+print(len(pdbs_of_pfam))
+
+pdbs_of_pfam=",".join(pdbs_of_pfam).lower()
+
+#Pedir por pedasos de pdbs, cada 500
+#Hacerlo
+PDBe_dic=(request_ligand_from_PDBe.ligands_from_pdbs(pdbs_of_pfam))
+
+for pfam in pfam_entry:
+    pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
+    for pdb in pdbs_of_pfam_list:
+        pdb_pfam_id=pdb[0].lower()
+        pdb_pfam_chain=pdb[1]
+        pdb_pfam_position=pdb[2]
+        try:
+            pdb_pfam_position_inicio=int(pdb_pfam_position.split(",")[0])
+            pdb_pfam_position_final=int(pdb_pfam_position.split(",")[1])
+        except:
+            #Valores extraños dentro de la posicion
+            continue
+
+        try:
+            if len(PDBe_dic[pdb_pfam_id])==0:
+                # Si esta en el PDBe pero esta vacio, es decir no tiene infomracion sobre los ligandos del pdbi
+                continue
+            else:
+                pdb_pdbe=PDBe_dic[pdb_pfam_id][0]
+
+            pdb_pdbe_residues=pdb_pdbe["site_residues"]
+            pdb_pdbe_details=pdb_pdbe["details"].split(" ")[4]
+
+            if pdb_pdbe_details == " ":
+                # El nombre del ligando esta corrido un lugar
+                pdb_pdbe_details=pdb_pdbe["details"].split(" ")[5]
+
+            for ligand in pdb_pdbe_residues:
+                posicion_ligando=int(ligand["residue_number"])
+                if ligand["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
+                    print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,ligand["chain_id"],posicion_ligando)
+        except:
+            #Si no esta ese pdb en PDBe
+            continue
