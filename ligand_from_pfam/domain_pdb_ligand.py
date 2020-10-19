@@ -60,8 +60,7 @@ for pfam in pfam_entry:
 
             pdb_pdbe_residues=pdb_pdbe["site_residues"]
             pdb_pdbe_details=pdb_pdbe["details"].split(" ")[4]
-
-            if pdb_pdbe_details == " ":
+            if pdb_pdbe_details == "":
                 # El nombre del ligando esta corrido un lugar
                 pdb_pdbe_details=pdb_pdbe["details"].split(" ")[5]
 
