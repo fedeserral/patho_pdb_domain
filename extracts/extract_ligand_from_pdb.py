@@ -5,10 +5,11 @@ from collections import defaultdict
 def PDB_ID(input_file):
     """file with PDB entry list"""
     pdb_ids = open(input_file)
-    lines=pdb_ids.readlines()
+    lines=pdb_ids.readlines()[1:]
     strip_pdb_ids = [line.strip() for line in lines ]
 
     pdb_ids.close()
+    print(strip_pdb_ids)
     return strip_pdb_ids
 
 def pdb_ligands_mapping(input_file):
@@ -19,21 +20,22 @@ def pdb_ligands_mapping(input_file):
     mapping.close()
     dic_out={}
     for line in mapping_lines:
-        lines = line.split(',')
+        lines = line.split(':')
+        
         key = lines[0].strip()
-        value = lines[1].strip()
+        value = [x.strip() for x in lines[1].strip().split(";") if x.strip()]
         if key in dic_out:
-          dic_out[key].append(value)
+            dic_out[key] += value
         else:
-          dic_out[key] = [value]
+          dic_out[key] = value
     return dic_out
 
 def id_cross(PDB_data, mapping_data):
     """Cross IDs between inputs file"""
 
     for pdb in PDB_data:
-        if pdb in mapping_data:
-            for ligand in mapping_data[pdb]:
+        if pdb.lower() in mapping_data:
+            for ligand in mapping_data[pdb.lower()]:
                 print(pdb+"\t"+str(ligand))
     return 0
 
