@@ -2,7 +2,6 @@ import request_ligand_from_PDBe
 import json
 
 # Parseo el archivo de pdb_pfam_mapping.txt" en un diccionario, key:pfam, valor los pdb y sus posiciones
-
 entrada=open("pdb_pfam_mapping.txt")
 lines=entrada.readlines()
 pfam_pdbs_dictionary={}
@@ -20,7 +19,7 @@ for line in lines[1:]:
         pfam_pdbs_dictionary[pfam]=list_aux
 
 #pfam_entry=['PF16203','PF04851','PF06777']
-pfam_entry=list(pfam_pdbs_dictionary.keys())[10:15]
+pfam_entry=list(pfam_pdbs_dictionary.keys())[9:15]
 
 all_pdbs_of_pfams=[]
 for pfam in pfam_entry:
@@ -53,7 +52,7 @@ for pfam in pfam_entry:
 
         try:
             if len(PDBe_dic[pdb_pfam_id])==0:
-                # Si esta en el PDBe pero esta vacio, es decir no tiene infomracion sobre los ligandos del pdbi
+                # Si esta en el PDBe pero esta vacio, es decir no tiene informacion sobre los ligandos del pdb
                 continue
             else:
                 pdb_pdbe=PDBe_dic[pdb_pfam_id][0]
