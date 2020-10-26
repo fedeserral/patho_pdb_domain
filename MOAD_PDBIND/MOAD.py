@@ -1,4 +1,5 @@
-import json
+import json 
+import argparse
 import toMolar
 
 def moad_parse(input_file):
@@ -66,9 +67,23 @@ def moad_parse(input_file):
                 record = { "name": pdb, "residues": []  }
                 record["residues"].append(residues)
                 compound_dict[compound]["pdbs"].append(record)
-
+                
     print(json.dumps(compound_dict, indent=4, sort_keys=True))
     return 0
 
-moad_parse("moad_db.txt")
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Create Ligand->PDB->Residues structure json database from MOAD file')
+    parser.add_argument("-i", '--moad_file', default='every_bind.csv', help="Provide input moad file and get json file")
+    return parser
+
+def main():
+    parser=parse_arguments()
+    args=parser.parse_args()
+    moad_parse(args.moad_file)
+    return 0
+
+if __name__=='__main__':
+    main()
+
+
 
