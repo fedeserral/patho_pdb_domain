@@ -4,7 +4,7 @@ import argparse
 import sys
 
 def pfam_mapping(file):
-    file=open("pdb_pfam_mapping.txt")
+    file=open(file)
     lines=file.readlines()
     pfam_pdbs_dictionary={}
     for line in lines[1:]:
@@ -63,7 +63,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                         print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,ligand["chain_id"],posicion_ligando)
             except:
             #Si no esta ese pdb en el dicionario de PDBe
-                sys.stderr.write("Warning! PDB is not in pdb_pfam_mapping file: "+pdb_pfam_id+"\n")
+                sys.stderr.write("Warning! PDB is not in PDBe: "+pdb_pfam_id+"\n")
                 continue
 
     return 0
