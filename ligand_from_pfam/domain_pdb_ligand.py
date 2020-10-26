@@ -11,6 +11,7 @@ def pfam_mapping(file):
         line=line.split("\t")
         pdb=line[0]
         chain=line[1]
+        # Saco las letras si es que las hay en la posicion
         position=''.join(i for i in line[2] if i.isdigit())+","+''.join(i for i in line[3] if i.isdigit())
         pfam=line[4].split(".")[0]
         if pfam not in pfam_pdbs_dictionary.keys():
@@ -52,13 +53,16 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                     continue
                 else:
                     pdb_pdbe=PDBe_dic[pdb_pfam_id][0]
+
                 pdb_pdbe_residues=pdb_pdbe["site_residues"]
                 pdb_pdbe_details=pdb_pdbe["details"].split(" ")[4]
                 if pdb_pdbe_details == "":
                 # El nombre del ligando esta corrido un lugar
                     pdb_pdbe_details=pdb_pdbe["details"].split(" ")[5]
                 for ligand in pdb_pdbe_residues:
-                    posicion_ligando=ligand["author_residue_number"]
+                    # Tiene letras el ligando? Las saco si las hay
+                    posicion_ligando=str(ligand["author_residue_number"])
+                    posicion_ligando=int(''.join(i for i in posicion_ligando if i.isdigit()))
                     if ligand["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
                         print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,ligand["chain_id"],posicion_ligando)
             except:
