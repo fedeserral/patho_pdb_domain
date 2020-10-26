@@ -1,72 +1,95 @@
 import request_ligand_from_PDBe
 import json
+import argparse
+import sys
 
-# Parseo el archivo de pdb_pfam_mapping.txt" en un diccionario, key:pfam, valor los pdb y sus posiciones
-entrada=open("pdb_pfam_mapping.txt")
-lines=entrada.readlines()
-pfam_pdbs_dictionary={}
-for line in lines[1:]:
-    line=line.split("\t")
-    pdb=line[0]
-    chain=line[1]
-    position=line[2]+","+line[3]
-    pfam=line[4].split(".")[0]
-    if pfam not in pfam_pdbs_dictionary.keys():
-        pfam_pdbs_dictionary[pfam]=[(pdb,chain,position)]
-    else:
-        list_aux=pfam_pdbs_dictionary[pfam]
-        list_aux.append((pdb,chain,position))
-        pfam_pdbs_dictionary[pfam]=list_aux
+def pfam_mapping(file):
+    file=open("pdb_pfam_mapping.txt")
+    lines=file.readlines()
+    pfam_pdbs_dictionary={}
+    for line in lines[1:]:
+        line=line.split("\t")
+        pdb=line[0]
+        chain=line[1]
+        position=''.join(i for i in line[2] if i.isdigit())+","+''.join(i for i in line[3] if i.isdigit())
+        pfam=line[4].split(".")[0]
+        if pfam not in pfam_pdbs_dictionary.keys():
+            pfam_pdbs_dictionary[pfam]=[(pdb,chain,position)]
+        else:
+            list_aux=pfam_pdbs_dictionary[pfam]
+            list_aux.append((pdb,chain,position))
+            pfam_pdbs_dictionary[pfam]=list_aux
 
-#pfam_entry=['PF16203','PF04851','PF06777']
-pfam_entry=list(pfam_pdbs_dictionary.keys())[9:15]
+    return pfam_pdbs_dictionary
 
-all_pdbs_of_pfams=[]
-for pfam in pfam_entry:
-    pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
-    all_pdbs_of_pfams=all_pdbs_of_pfams+pdbs_of_pfam_list
+def request(pfam_entry, pfam_pdbs_dictionary):
+    all_pdbs_of_pfams=[]
+    for pfam in pfam_entry:
+        pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
+        all_pdbs_of_pfams=all_pdbs_of_pfams+pdbs_of_pfam_list
+    pdbs_of_pfam=[pdb[0] for pdb in all_pdbs_of_pfams]
+    sys.stderr.write("Warning! Number of pdbs to request: "+str(len(pdbs_of_pfam))+"\n")
+    pdbs_of_pfam=list(set(pdbs_of_pfam))
+    sys.stderr.write("Warning! Number of uniques pdbs to request: "+str(len(pdbs_of_pfam))+"\n")
+    pdbs_of_pfam=",".join(pdbs_of_pfam).lower()
+    PDBe_dic=(request_ligand_from_PDBe.ligands_from_pdbs(pdbs_of_pfam))
 
-pdbs_of_pfam=[pdb[0] for pdb in all_pdbs_of_pfams]
-print(len(pdbs_of_pfam))
-pdbs_of_pfam=list(set(pdbs_of_pfam))
-print(len(pdbs_of_pfam))
+    return PDBe_dic
 
-pdbs_of_pfam=",".join(pdbs_of_pfam).lower()
-
-#Pedir por pedasos de pdbs, cada 500
-#Hacerlo
-PDBe_dic=(request_ligand_from_PDBe.ligands_from_pdbs(pdbs_of_pfam))
-
-for pfam in pfam_entry:
-    pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
-    for pdb in pdbs_of_pfam_list:
-        pdb_pfam_id=pdb[0].lower()
-        pdb_pfam_chain=pdb[1]
-        pdb_pfam_position=pdb[2]
-        try:
+def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
+    for pfam in pfam_entry:
+        pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
+        for pdb in pdbs_of_pfam_list:
+            pdb_pfam_id=pdb[0].lower()
+            pdb_pfam_chain=pdb[1]
+            pdb_pfam_position=pdb[2]
             pdb_pfam_position_inicio=int(pdb_pfam_position.split(",")[0])
             pdb_pfam_position_final=int(pdb_pfam_position.split(",")[1])
-        except:
-            #Valores extraños dentro de la posicion
-            continue
-
-        try:
-            if len(PDBe_dic[pdb_pfam_id])==0:
+            try:
+                if len(PDBe_dic[pdb_pfam_id])==0:
                 # Si esta en el PDBe pero esta vacio, es decir no tiene informacion sobre los ligandos del pdb
-                continue
-            else:
-                pdb_pdbe=PDBe_dic[pdb_pfam_id][0]
-
-            pdb_pdbe_residues=pdb_pdbe["site_residues"]
-            pdb_pdbe_details=pdb_pdbe["details"].split(" ")[4]
-            if pdb_pdbe_details == "":
+                    sys.stderr.write("Warning! PDB with no data in PDBe: "+pdb_pfam_id+"\n")
+                    continue
+                else:
+                    pdb_pdbe=PDBe_dic[pdb_pfam_id][0]
+                pdb_pdbe_residues=pdb_pdbe["site_residues"]
+                pdb_pdbe_details=pdb_pdbe["details"].split(" ")[4]
+                if pdb_pdbe_details == "":
                 # El nombre del ligando esta corrido un lugar
-                pdb_pdbe_details=pdb_pdbe["details"].split(" ")[5]
-
-            for ligand in pdb_pdbe_residues:
-                posicion_ligando=int(ligand["residue_number"])
-                if ligand["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
-                    print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,ligand["chain_id"],posicion_ligando)
-        except:
+                    pdb_pdbe_details=pdb_pdbe["details"].split(" ")[5]
+                for ligand in pdb_pdbe_residues:
+                    posicion_ligando=ligand["author_residue_number"]
+                    if ligand["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
+                        print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,ligand["chain_id"],posicion_ligando)
+            except:
             #Si no esta ese pdb en el dicionario de PDBe
-            continue
+                sys.stderr.write("Warning! PDB is not in pdb_pfam_mapping file: "+pdb_pfam_id+"\n")
+                continue
+
+    return 0
+
+def pfam_entry_handly(file):
+    input=open(file,"r")
+    line=input.readlines()[0]
+
+    return line.rstrip().split(" ")
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument("-f", '--pdb_pfam_mapping', default='pdb_pfam_mapping.txt', help="")
+    parser.add_argument('-i','--pfam_input', default='pfam_entry.txt', help="")
+
+    return parser
+
+def main():
+    parser=parse_arguments()
+    args=parser.parse_args()
+    pfams=pfam_entry_handly(args.pfam_input)
+    pfam_pdbs_dictionary=pfam_mapping(args.pdb_pfam_mapping)
+    PDBe_dic=request(pfams,pfam_pdbs_dictionary)
+    pfam_pdb_ligand(pfams, PDBe_dic, pfam_pdbs_dictionary)
+
+    return 0
+
+if __name__=='__main__':
+    main()

@@ -3,7 +3,7 @@ import argparse
 import toMolar
 
 def moad_parse(input_file):
-    """Toma la base de datos MOAD y la parsea en un JSON con jerarquias compuestos > pdb > cadena."""
+    """Toma la base de datos MOAD y la parsea en un JSON con jerarquias Ligand->PDB->Residues."""
     input_file=open(input_file,"r")
     input_file_lines=input_file.readlines()
     input_file.close()
@@ -67,7 +67,7 @@ def moad_parse(input_file):
                 record = { "name": pdb, "residues": []  }
                 record["residues"].append(residues)
                 compound_dict[compound]["pdbs"].append(record)
-                
+
     print(json.dumps(compound_dict, indent=4, sort_keys=True))
     return 0
 
