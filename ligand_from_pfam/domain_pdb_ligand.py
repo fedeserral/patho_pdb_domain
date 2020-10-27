@@ -1,5 +1,4 @@
 import request_ligand_from_PDBe
-import json
 import argparse
 import sys
 
@@ -26,20 +25,26 @@ def pfam_mapping(file):
 def request(pfam_entry, pfam_pdbs_dictionary):
     all_pdbs_of_pfams=[]
     for pfam in pfam_entry:
-        pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
+        try:
+            pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
+        except:
+            sys.stderr.write("Warning! pfam id not in pdb_pfam_mapping: "+pfam+"\n")
+            continue
         all_pdbs_of_pfams=all_pdbs_of_pfams+pdbs_of_pfam_list
     pdbs_of_pfam=[pdb[0] for pdb in all_pdbs_of_pfams]
     sys.stderr.write("Warning! Number of pdbs to request: "+str(len(pdbs_of_pfam))+"\n")
     pdbs_of_pfam=list(set(pdbs_of_pfam))
     sys.stderr.write("Warning! Number of uniques pdbs to request: "+str(len(pdbs_of_pfam))+"\n")
-    pdbs_of_pfam=",".join(pdbs_of_pfam).lower()
     PDBe_dic=(request_ligand_from_PDBe.ligands_from_pdbs(pdbs_of_pfam))
 
     return PDBe_dic
 
 def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
     for pfam in pfam_entry:
-        pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
+        try:
+            pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
+        except:
+            continue
         for pdb in pdbs_of_pfam_list:
             pdb_pfam_id=pdb[0].lower()
             pdb_pfam_chain=pdb[1]
