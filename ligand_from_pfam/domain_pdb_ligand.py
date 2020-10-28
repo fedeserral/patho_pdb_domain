@@ -56,11 +56,11 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
             # Si esta en el PDBe pero esta vacio, es decir no tiene informacion sobre los ligandos del pdb
                 sys.stderr.write("Warning! PDB with no data in PDBe: "+pdb_pfam_id+"\n")
                 pass
+            
             else:
-
                 pdb_pdbe=PDBe_dic[pdb_pfam_id]
                 for residues in pdb_pdbe:
-                    pdb_pdbe_residues=residues["site_residues"]
+                    site_residues=residues["site_residues"]
                     # Si el details viene vacio. me  salteo la busqueda de ese pdb
                     if residues["details"]==None or residues["details"]=="DESCRIPTION NOT PROVIDED":
                         pass
@@ -69,12 +69,14 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                         if pdb_pdbe_details == "":
                         # El nombre del ligando esta corrido un lugar
                             pdb_pdbe_details=residues["details"].split(" ")[5]
-                        for ligand in pdb_pdbe_residues:
+                        for site in site_residues:
                             # Tiene letras el ligando? Las saco si las hay
-                            posicion_ligando=str(ligand["author_residue_number"])
+                            posicion_ligando=str(site["author_residue_number"])
                             posicion_ligando=int(''.join(i for i in posicion_ligando if i.isdigit()))
-                            if ligand["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
-                                print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,ligand["chain_id"],posicion_ligando)
+                            if site["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
+                                print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,site["chain_id"],posicion_ligando)
+
+
     return 0
 
 def pfam_entry_handly(file):
