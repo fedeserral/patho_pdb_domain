@@ -74,9 +74,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                             two_inOneDetail_data=residues["details"].split(" ")[8]
                         else:
                             two_inOneDetail=False
-                        if pdb_pdbe_details == "":
-                        # El nombre del ligando esta corrido un lugar
-                            pdb_pdbe_details=residues["details"].split(" ")[5]
+                            
                         for site in site_residues:
                             # Tiene letras el ligando? Las saco si las hay
                             posicion_ligando=str(site["author_residue_number"])
