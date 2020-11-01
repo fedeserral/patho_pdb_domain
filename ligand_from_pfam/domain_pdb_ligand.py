@@ -40,6 +40,7 @@ def request(pfam_entry, pfam_pdbs_dictionary):
     return PDBe_dic
 
 def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
+    ligands_list=[]
     for pfam in pfam_entry:
         try:
             pdbs_of_pfam_list=pfam_pdbs_dictionary[pfam]
@@ -61,11 +62,17 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                 pdb_pdbe=PDBe_dic[pdb_pfam_id]
                 for residues in pdb_pdbe:
                     site_residues=residues["site_residues"]
+                    author_insertion_code=residues.get("author_insertion_code","None")
                     # Si el details viene vacio. me  salteo la busqueda de ese pdb
-                    if residues["details"]==None or residues["details"]=="DESCRIPTION NOT PROVIDED":
+                    if residues["details"]==None or residues["details"].split(" ")[0].lower()!="binding":
                         pass
                     else:
                         pdb_pdbe_details=residues["details"].split(" ")[4]
+                        if len(residues["details"].split(" ")) == 11:
+                            two_inOneDetail=True
+                            two_inOneDetail_data=residues["details"].split(" ")[8]
+                        else:
+                            two_inOneDetail=False
                         if pdb_pdbe_details == "":
                         # El nombre del ligando esta corrido un lugar
                             pdb_pdbe_details=residues["details"].split(" ")[5]
@@ -74,16 +81,29 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                             posicion_ligando=str(site["author_residue_number"])
                             posicion_ligando=int(''.join(i for i in posicion_ligando if i.isdigit()))
                             if site["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
-                                print(pfam,pdb_pfam_chain,pdb_pfam_position_inicio,pdb_pfam_position_final,pdb_pfam_id,pdb_pdbe_details,site["chain_id"],posicion_ligando)
+                                out=[pfam,pdb_pfam_chain,str(pdb_pfam_position_inicio),str(pdb_pfam_position_final),pdb_pfam_id,pdb_pdbe_details,site["chain_id"],str(posicion_ligando),author_insertion_code]
+                                out=" ".join(out)
+                                sys.stderr.write(out+"\n")
+                                ligands_list.append(pdb_pdbe_details)
+                                if two_inOneDetail:
+                                    out=[pfam,pdb_pfam_chain,str(pdb_pfam_position_inicio),str(pdb_pfam_position_final),pdb_pfam_id,two_inOneDetail_data,site["chain_id"],str(posicion_ligando),author_insertion_code]
+                                    out=" ".join(out)
+                                    sys.stderr.write(out+"\n")
+                                    ligands_list.append(two_inOneDetail_data)
 
-
+    ligands_list=list(set(ligands_list))
+    print(*ligands_list, sep = "\n")
     return 0
 
 def pfam_entry_handly(file):
     input=open(file,"r")
-    line=input.readlines()[0]
-
-    return line.rstrip().split(" ")
+    lines=input.readlines()
+    output=[]
+    for line in lines:
+        line=line.rstrip()
+        if line[0]!="#":
+            output.append(line)
+    return output
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='')
