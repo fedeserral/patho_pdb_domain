@@ -69,6 +69,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                     else:
                         pdb_pdbe_details=residues["details"].split(" ")[4]
                         if len(residues["details"].split(" ")) == 11:
+                        # Puede haber dos ligandos por detail. Cuando pasa eso Tomo los dos
                             two_inOneDetail=True
                             two_inOneDetail_data=residues["details"].split(" ")[8]
                         else:
@@ -93,6 +94,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
 
     ligands_list=list(set(ligands_list))
     print(*ligands_list, sep = "\n")
+    
     return 0
 
 def pfam_entry_handly(file):
