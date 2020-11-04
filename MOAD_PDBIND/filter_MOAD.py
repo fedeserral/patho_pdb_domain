@@ -49,8 +49,8 @@ def parse_arguments():
 
 def main():
     all_cofactors = ["ADP","AMP","NAD","NDP","GTP","GDP","ATP","UDP","UFP",
-    "ALA","LYS","VAL","ARG","GLY","CYS","TYR", "PHE", "LEU","ILE","MET","SER","PRO","THR","HIS","ASN","GLN","GLU","ASP","TRP",
-    "ADN","UFP"]
+    "ALA","LYS","VAL","ARG","GLY","CYS","TYR", "PHE", "LEU","ILE","MET","SER","PRO","THR","HIS","ASN","GLN","GLU","ASP","TRP"]
+    
     parser=parse_arguments()
     args=parser.parse_args()
     cofactors = all_cofactors if args.filter_cofactors else []
