@@ -1,5 +1,5 @@
 from distutils.core import setup
-setup(name='',
+setup(name='patho_pdb_domain',
 		version='0.4.1',
 		py_modules=['uniprot'],
 		scripts=['uniprot'],
