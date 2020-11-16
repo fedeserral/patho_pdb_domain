@@ -6,7 +6,7 @@ setup(name='patho_pdb_domain',
 			 ,'extracts/extract_pdb_from_domain.py','extracts/protein_id_extract_to_uniprot.py'
 			 ,'ligand_from_pdb/domain_pdb_ligand.py','ligand_from_pdb/request_ligand_from_PDBe.py'],
 
-		requires=['requests','argparse'],
+		requires=['requests','argparse','sys'],
 
 		author='Federico Serral',
 		license='MIT license',
