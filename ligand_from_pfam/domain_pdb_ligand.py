@@ -53,7 +53,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
             pdb_pfam_position_inicio=int(pdb_pfam_position.split(",")[0])
             pdb_pfam_position_final=int(pdb_pfam_position.split(",")[1])
 
-            if len(PDBe_dic[pdb_pfam_id])==0:
+            if (pdb_pfam_id not in PDBe_dic) or (len(PDBe_dic[pdb_pfam_id])==0):
             # Si esta en el PDBe pero esta vacio, es decir no tiene informacion sobre los ligandos del pdb
                 sys.stderr.write("Warning! PDB with no data in PDBe: "+pdb_pfam_id+"\n")
                 pass
