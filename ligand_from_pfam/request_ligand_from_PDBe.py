@@ -2,14 +2,16 @@ import requests
 import json
 
 def pdb_ligand_data(ligands):
-   #
+  
    r = requests.post("https://www.ebi.ac.uk/pdbe/api/pdb/compound/summary/",data=",".join(ligands))
    if r.ok:
        data =  r.json()  
        new_data = []
        for k,v in data.items():
            r = v[0]            
-           r2 = {"smiles":r["smiles"][0]["name"],"pdb_ligand":k}
+           r2 = {"pdb_ligand":k}
+           if len(r["smiles"]):
+               r2["smiles"] = r["smiles"][0]["name"]
            if "chembl_id" in r:
                r2["chembl_id"] = r["chembl_id"]            
            new_data.append(r2)
@@ -27,7 +29,7 @@ def search_chembl(chembl_id):
    raise Exception(r.text)
 
 def pdb_ligand_data_batch(ligands,n=400):    
-   ligs_chunks = [ligs[i:i + n] for i in range(0, len(ligs), n)]
+   ligs_chunks = [ligands[i:i + n] for i in range(0, len(ligands), n)]
    all_pdb_ligands = reduce(list.__add__, [pdb_ligand_data( chunk ) for chunk in tqdm(ligs_chunks)])    
    return all_pdb_ligands
 
