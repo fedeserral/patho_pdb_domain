@@ -2,9 +2,8 @@ import request_ligand_from_PDBe
 import argparse
 import sys
 
-def pfam_mapping(file):
-    file=open(file)
-    lines=file.readlines()
+def pfam_mapping(pfam_pdb_mapping_handle):
+    lines=pfam_pdb_mapping_handle.readlines()
     pfam_pdbs_dictionary={}
     for line in lines[1:]:
         line=line.split("\t")
@@ -91,9 +90,9 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                                     ligands_list.append(two_inOneDetail_data)
 
     ligands_list=list(set(ligands_list))
-    print(*ligands_list, sep = "\n")
     
-    return 0
+    
+    return ligands_list
 
 def pfam_entry_handly(file):
     input=open(file,"r")
@@ -112,15 +111,20 @@ def parse_arguments():
 
     return parser
 
+def domain_pdb_ligand(pfams, pfam_pdb_mapping_handle):
+    pfam_pdbs_dictionary=pfam_mapping(pfam_pdb_mapping_handle)
+    PDBe_dic=request(pfams,pfam_pdbs_dictionary)
+    return pfam_pdb_ligand(pfams, PDBe_dic, pfam_pdbs_dictionary) 
+    
+
 def main():
     parser=parse_arguments()
     args=parser.parse_args()
     pfams=pfam_entry_handly(args.pfam_input)
-    pfam_pdbs_dictionary=pfam_mapping(args.pdb_pfam_mapping)
-    PDBe_dic=request(pfams,pfam_pdbs_dictionary)
-    pfam_pdb_ligand(pfams, PDBe_dic, pfam_pdbs_dictionary)
-
-    return 0
-
+    with open(args.pdb_pfam_mapping) as pdb_pfam_handle:
+        ligands = domain_pdb_ligand(pfams, pdb_pfam_handle)
+    print("\n".join(ligands))           
+    
+    
 if __name__=='__main__':
     main()
