@@ -1,4 +1,4 @@
-import ligand_from_pfam.request_ligand_from_PDBe
+from ligand_from_pfam.request_ligand_from_PDBe import ligands_from_pdbs
 import argparse
 import sys
 
@@ -34,7 +34,7 @@ def request(pfam_entry, pfam_pdbs_dictionary):
     sys.stderr.write("Warning! Number of pdbs to request: "+str(len(pdbs_of_pfam))+"\n")
     pdbs_of_pfam=list(set(pdbs_of_pfam))
     sys.stderr.write("Warning! Number of uniques pdbs to request: "+str(len(pdbs_of_pfam))+"\n")
-    PDBe_dic=(request_ligand_from_PDBe.ligands_from_pdbs(pdbs_of_pfam))
+    PDBe_dic=(ligands_from_pdbs(pdbs_of_pfam))
 
     return PDBe_dic
 
