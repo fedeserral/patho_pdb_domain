@@ -1,4 +1,4 @@
-import request_ligand_from_PDBe
+import ligand_from_pfam.request_ligand_from_PDBe
 import argparse
 import sys
 
