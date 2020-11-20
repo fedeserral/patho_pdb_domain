@@ -111,7 +111,7 @@ def parse_arguments():
 
     return parser
 
-def domain_pdb_ligand(pfams, pfam_pdb_mapping_handle):
+def ligands_from_domain(pfams, pfam_pdb_mapping_handle):
     pfam_pdbs_dictionary=pfam_mapping(pfam_pdb_mapping_handle)
     PDBe_dic=request(pfams,pfam_pdbs_dictionary)
     return pfam_pdb_ligand(pfams, PDBe_dic, pfam_pdbs_dictionary) 
@@ -122,7 +122,7 @@ def main():
     args=parser.parse_args()
     pfams=pfam_entry_handly(args.pfam_input)
     with open(args.pdb_pfam_mapping) as pdb_pfam_handle:
-        ligands = domain_pdb_ligand(pfams, pdb_pfam_handle)
+        ligands = ligands_from_domain(pfams, pdb_pfam_handle)
     print("\n".join(ligands))           
     
     
