@@ -1,6 +1,7 @@
 from ligand_from_pfam.request_ligand_from_PDBe import ligands_from_pdbs
 import argparse
 import sys
+import pandas as pd
 
 def pfam_mapping(pfam_pdb_mapping_handle):
     lines=pfam_pdb_mapping_handle.readlines()
@@ -39,6 +40,11 @@ def request(pfam_entry, pfam_pdbs_dictionary):
     return PDBe_dic
 
 def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
+    """
+    pfam_entry: list of pfam domains
+    PDBe_dic: binding PDB/API dict
+    pfam_pdbs_dictionary: pfam domains = key , pdb list = value
+    """
     ligands_list=[]
     for pfam in pfam_entry:
         try:
@@ -80,19 +86,17 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                             posicion_ligando=int(''.join(i for i in posicion_ligando if i.isdigit()))
                             if site["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
                                 out=[pfam,pdb_pfam_chain,str(pdb_pfam_position_inicio),str(pdb_pfam_position_final),pdb_pfam_id,pdb_pdbe_details,site["chain_id"],str(posicion_ligando),author_insertion_code]
-                                out=" ".join(out)
-                                sys.stderr.write(out+"\n")
-                                ligands_list.append(pdb_pdbe_details)
+                                ligands_list.append(out)
+#                                 sys.stderr.write(out+"\n")
+#                                 ligands_list.append(pdb_pdbe_details)
                                 if two_inOneDetail:
                                     out=[pfam,pdb_pfam_chain,str(pdb_pfam_position_inicio),str(pdb_pfam_position_final),pdb_pfam_id,two_inOneDetail_data,site["chain_id"],str(posicion_ligando),author_insertion_code]
-                                    out=" ".join(out)
-                                    sys.stderr.write(out+"\n")
-                                    ligands_list.append(two_inOneDetail_data)
+                                    ligands_list.append(out)
+#                                     sys.stderr.write(out+"\n")
+#                                     ligands_list.append(two_inOneDetail_data)
 
-    ligands_list=list(set(ligands_list))
-    
-    
-    return ligands_list
+        
+    return pd.DataFrame(ligands_list,columns=["domain", "chain" ,"resid_start" ,"resid_end" , "pdb", "ligand", "ligand_chain", "ligand_resid", "insertion_code"])
 
 def pfam_entry_handly(file):
     input=open(file,"r")
