@@ -1,6 +1,6 @@
 from distutils.core import setup
 setup(name='patho_pdb_domain',
-		version='0.0.11',
+		version='0.0.12',
 		py_modules=['MOAD_PDBIND','extracts','ligand_from_pfam',
 			    'ligand_from_pfam.domain_pdb_ligand','ligand_from_pfam.request_ligand_from_PDBe',
 			    'extracts.extract_ligand_from_pdb','extracts.extract_pdb_from_domain','extracts.protein_id_extract_to_uniprot'],
