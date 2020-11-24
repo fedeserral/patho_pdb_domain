@@ -45,8 +45,8 @@ def id_cross(PDB_data, mapping_data):
     return ligand_pdb
 
 
-def ligands_from_pdb(pdb:str,ligand_pdb_mapping:dict):
-    return id_cross([pdb], ligand_pdb_mapping)
+def ligands_from_pdb(pdbs:list,ligand_pdb_mapping:dict):
+    return id_cross(pdbs, ligand_pdb_mapping)
 
 def parse_arguments():
 
