@@ -12,12 +12,12 @@ def PDB_ID(input_file):
 
     return strip_pdb_ids
 
-def pdb_ligands_mapping(input_file):
+def pdb_ligands_mapping(mapping_handle):
     """ mapping_ligands_pdb
     columns: 0=PDB_ID; 1=ligands"""
-    mapping = open(input_file)
-    mapping_lines=mapping.readlines()
-    mapping.close()
+    
+    mapping_lines=mapping_handle.readlines()
+    
     dic_out={}
     for line in mapping_lines:
         lines = line.split(':')
@@ -41,16 +41,18 @@ def id_cross(PDB_data, mapping_data):
                     ligand_pdb[ligand]=[]
                 if pdb not in ligand_pdb[ligand]:
                     ligand_pdb[ligand].append(pdb)
-    for ligand,pdb in ligand_pdb.items():
-        print(ligand + "\t"+ "|".join(pdb))
-    return 0
+    
+    return ligand_pdb
 
+
+def ligands_from_pdb(pdb:str,ligand_pdb_mapping:dict):
+    return id_cross([pdb], ligand_pdb_mapping)
 
 def parse_arguments():
 
     parser = argparse.ArgumentParser(description='Extract ligands from PDB entries')
     parser.add_argument("-p", '--PDB_list', default=None, help="Input file should have PDB ID list")
-    parser.add_argument("-m", '--mapping_ligands_pdb',  default="lig_pairs.lst", help="Input file of ligands and PDB ID link:http://www.ebi.ac.uk/thornton-srv/databases/pdbsum/data/lig_pairs.lst")
+    parser.add_argument("-m", '--mapping_ligands_pdb',  default="lig_pairs.lst", help="Input file of ligands and PDB ID link: http://www.ebi.ac.uk/thornton-srv/databases/pdbsum/data/lig_pairs.lst")
 
     return parser
 
@@ -58,8 +60,10 @@ def main():
 
     parser=parse_arguments()
     args=parser.parse_args()
-
-    id_cross(PDB_ID(args.PDB_list), pdb_ligands_mapping(args.mapping_ligands_pdb))
+    with open(args.mapping_ligands_pdb) as mapping_handle:
+        ligand_pdb = id_cross(PDB_ID(args.PDB_list), pdb_ligands_mapping(mapping_handle))
+    for ligand,pdb in ligand_pdb.items():
+        print(ligand + "\t"+ "|".join(pdb))
     return 0
 
 
