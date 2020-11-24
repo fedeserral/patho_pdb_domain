@@ -72,7 +72,18 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                     if residues["details"]==None or residues["details"].split(" ")[0].lower()!="binding":
                         pass
                     else:
-                        pdb_pdbe_details=residues["details"].split(" ")[4]
+                        #Example1: binding site for residue PO4 A 503
+                        #Example2: binding site for Ligand residues SEP A 59 through GLY A 60 bound to SER A 58                        
+                        #Example 1bkx: BINDING SITE FOR RESIDUE A A 351 --> uses 3
+                        
+                        pdb_pdbe_details=residues["details"].replace("Ligand ").split(" ")[4]
+                        
+                        #Example 4hpu: BINDING SITE FOR CHAIN I OF CAMP-DEPENDENT PROTEIN KINASE INHIBITOR ALPHA                                               
+                        #Example 4ib5: BINDING SITE FOR CHAIN F OF CK2BETA-DERIVED CYCLIC PEPTIDE
+                        if residues["details"].split(" ")[3] == "CHAIN":
+                            continue
+                        
+                        
                         if len(residues["details"].split(" ")) == 11:
                         # Puede haber dos ligandos por detail. Cuando pasa eso Tomo los dos
                             two_inOneDetail=True
