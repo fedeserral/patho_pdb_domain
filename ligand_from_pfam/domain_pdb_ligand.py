@@ -76,7 +76,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                         #Example2: binding site for Ligand residues SEP A 59 through GLY A 60 bound to SER A 58                        
                         #Example 1bkx: BINDING SITE FOR RESIDUE A A 351 --> uses 3
                         
-                        pdb_pdbe_details=residues["details"].replace("Ligand ").split(" ")[4]
+                        pdb_pdbe_details=residues["details"].replace("Ligand", "").split(" ")[4]
                         
                         #Example 4hpu: BINDING SITE FOR CHAIN I OF CAMP-DEPENDENT PROTEIN KINASE INHIBITOR ALPHA                                               
                         #Example 4ib5: BINDING SITE FOR CHAIN F OF CK2BETA-DERIVED CYCLIC PEPTIDE
