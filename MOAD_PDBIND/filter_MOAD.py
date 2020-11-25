@@ -1,6 +1,17 @@
 import json
 import argparse
 
+peptide = ["ALA","LYS","VAL","ARG","GLY","CYS","TYR", "PHE","LEU","ILE","MET",
+ "SER","PRO","THR","HIS","ASN","GLN","GLU","ASP","TRP"]
+family_nad = ["NAD","NAI","NDC","TAP","ADJ","NAJ","NDO","ZID","CAN","NAP","NDP",
+ "CND","NAQ","NHD","DND","NAX","NHO","NAC","NDB","ODP","NAE","NBP","PAD","NAH","NDA","SND"]
+family_fad = ["FAD","FMN","6FA","FNS","FAA","MGD","FAB","RFL","FAE","FAS","FDA",
+  "FMA"]
+nucl =["AMP","GDP","UDP","ADP","GNP","UTP","ANP", "GTP","PSU","ATP","2GP",
+ "CMP","TMP","CDP","TDP","CTP","TTP","GMP","UMP"]
+mol_junk = ["UNK", "UNX" "BMA","FUC","MAN","POP","BOG","GAL","MES","PYR","C8E","GLC","MPD",
+ "SPM","CIT","GOL","MYR","TRS","CRY","HED","NAG","XYS","DTT","LDA","NGA","EPE","LI1","PEG","F6P","MAL","PG4"]
+
 def moad_db(input_file):
     with open(input_file) as a:
          MOAD = json.load(a)
@@ -28,7 +39,7 @@ def ligands(input_file):
     ligands_list.close()
     return ligands
 
-def true_ligands(MOAD,ligands,limit,aa,nad,fad,nucleotides,junk):
+def true_ligands(MOAD,ligands,aa,nad,fad,nucleotides,junk):
     invalids=invalid_list(MOAD, limit) + aa + nad + fad + nucleotides + junk
     valid_ligands =[]
     for ligand_tuple in ligands:
@@ -51,17 +62,17 @@ def parse_arguments():
 
     return parser
 
+def filter_ligands(ligands,moad_json,limit=0.2,aa=False,nad=False,fad=False,nucleotides=False,junk=True):
+    aa = peptide if aa else []
+    nad = family_nad if nad else []
+    fad = family_fad if fad else []
+    nucleotides = nucl if nucl else []
+    junk = mol_junk if junk else []
+    return true_ligands (moad_json,ligands,limit,aa,nad,fad,nucleotides,junk)
+    
+
 def main():
-    peptide = ["ALA","LYS","VAL","ARG","GLY","CYS","TYR", "PHE","LEU","ILE","MET",
-     "SER","PRO","THR","HIS","ASN","GLN","GLU","ASP","TRP"]
-    family_nad = ["NAD","NAI","NDC","TAP","ADJ","NAJ","NDO","ZID","CAN","NAP","NDP",
-     "CND","NAQ","NHD","DND","NAX","NHO","NAC","NDB","ODP","NAE","NBP","PAD","NAH","NDA","SND"]
-    family_fad = ["FAD","FMN","6FA","FNS","FAA","MGD","FAB","RFL","FAE","FAS","FDA",
-      "FMA"]
-    nucl =["AMP","GDP","UDP","ADP","GNP","UTP","ANP", "GTP","PSU","ATP","2GP",
-     "CMP","TMP","CDP","TDP","CTP","TTP","GMP","UMP"]
-    mol_junk = ["UNK", "UNX" "BMA","FUC","MAN","POP","BOG","GAL","MES","PYR","C8E","GLC","MPD",
-     "SPM","CIT","GOL","MYR","TRS","CRY","HED","NAG","XYS","DTT","LDA","NGA","EPE","LI1","PEG","F6P","MAL","PG4"]
+   
     parser=parse_arguments()
     args=parser.parse_args()
     aa = peptide if args.filter_aa else []
