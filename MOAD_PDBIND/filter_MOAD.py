@@ -44,7 +44,7 @@ def true_ligands(MOAD,ligands,limit,aa,nad,fad,nucleotides,junk):
     valid_ligands_key={}
     valid_ligands =[]
     for ligand_tuple in ligands:
-        key= "_".join(ligand_tuple[:2])
+        key= "_".join(ligand_tuple)
         if key not in valid_ligands_key:
          valid_ligands_key[key]=1
          if ligand_tuple[0].strip() not in invalids:
