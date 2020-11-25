@@ -41,10 +41,14 @@ def ligands(input_file):
 
 def true_ligands(MOAD,ligands,limit,aa,nad,fad,nucleotides,junk):
     invalids=invalid_list(MOAD, limit) + aa + nad + fad + nucleotides + junk
+    valid_ligands_key={}
     valid_ligands =[]
     for ligand_tuple in ligands:
-        if ligand_tuple[0].strip() not in invalids:
-            valid_ligands.append(ligand_tuple)
+        key= "_".join(ligand_tuple[:2])
+        if key not in valid_ligands_key:
+         valid_ligands_key[key]=1
+         if ligand_tuple[0].strip() not in invalids:
+             valid_ligands.append(ligand_tuple)
     return valid_ligands
 
 
