@@ -39,7 +39,7 @@ def ligands(input_file):
     ligands_list.close()
     return ligands
 
-def true_ligands(MOAD,ligands,aa,nad,fad,nucleotides,junk):
+def true_ligands(MOAD,ligands,limit,aa,nad,fad,nucleotides,junk):
     invalids=invalid_list(MOAD, limit) + aa + nad + fad + nucleotides + junk
     valid_ligands =[]
     for ligand_tuple in ligands:
