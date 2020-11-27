@@ -1,5 +1,45 @@
 import requests
 import json
+sources = {x.split()[0]:x.split()[1] for x in """ 1	chembl
+2	drugbank
+3	pdb
+4	gtopdb
+5	pubchem_dotf
+6	kegg_ligand
+7	chebi
+8	nih_ncc
+9	zinc
+10	emolecules
+11	ibm
+12	atlas
+14	fdasrs
+15	surechembl
+17	pharmgkb
+18	hmdb
+20	selleck
+21	pubchem_tpharma
+22	pubchem
+23	mcule
+24	nmrshiftdb2
+25	lincs
+26	actor
+27	recon
+28	molport
+29	nikkaji
+31	bindingdb
+32	comptox
+33	lipidmaps
+34	drugcentral
+35	carotenoiddb
+36	metabolights
+37	brenda
+38	rhea
+39	chemicalbook
+40	dailymed_old
+41	swisslipids
+45	dailymed
+46	clinicaltrials
+47	rxnorm""".split("\n")}
 
 def pdb_ligand_data(ligands):
   
