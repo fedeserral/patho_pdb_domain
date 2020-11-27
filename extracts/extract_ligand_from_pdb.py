@@ -1,20 +1,24 @@
 import argparse
 from collections import defaultdict
+import pandas as pd
 
 
-def PDB_ID(input_file):
-    """file with PDB entry list"""
+def PDB_ID(input_file, skip_lines=1):
+    """input_file: file with PDB entry list
+    skip_lines: lines to skip(defualt=1, column name)
+    returns pdb list"""
     pdb_ids = open(input_file)
-    lines=pdb_ids.readlines()[1:]
-    strip_pdb_ids = [line.lower().strip() for line in lines ]
+    lines=pdb_ids.readlines()[skip_lines:]
+    strip_pdb_ids = [line.lower().strip() for line in lines if not line.strip().startswith("#")]
 
     pdb_ids.close()
 
     return strip_pdb_ids
 
 def pdb_ligands_mapping(mapping_handle):
-    """ mapping_ligands_pdb
-    columns: 0=PDB_ID; 1=ligands"""
+    """reads a lig_pairs.lst file and builds a dict(key:pdb , value:ligand) 
+       mapping_handle: file with pdb:ligand information  
+       columns: 0=PDB_ID; 1=ligands """
     
     mapping_lines=mapping_handle.readlines()
     
@@ -32,17 +36,19 @@ def pdb_ligands_mapping(mapping_handle):
 
 def id_cross(PDB_data, mapping_data):
     """Cross IDs between inputs file"""
-    ligand_pdb={}
+    ligand_pdb=[]
+    ligand_pdb_key={}
 
     for pdb in PDB_data:
         if pdb.lower() in mapping_data:
             for ligand in mapping_data[pdb.lower()]:
-                if ligand not in ligand_pdb:
-                    ligand_pdb[ligand]=[]
-                if pdb not in ligand_pdb[ligand]:
-                    ligand_pdb[ligand].append(pdb)
+                key= ligand + "|" + pdb
+                if key not in ligand_pdb_key:
+                    ligand_pdb.append([ligand,pdb])
+                    ligand_pdb_key[key]=1
+                    
     
-    return ligand_pdb
+    return pd.DataFrame(ligand_pdb, columns=["ligand", "pdb"])
 
 
 def ligands_from_pdb(pdbs:list,ligand_pdb_mapping:dict):
@@ -62,7 +68,7 @@ def main():
     args=parser.parse_args()
     with open(args.mapping_ligands_pdb) as mapping_handle:
         ligand_pdb = id_cross(PDB_ID(args.PDB_list), pdb_ligands_mapping(mapping_handle))
-    for ligand,pdb in ligand_pdb.items():
+    for ligand,pdb in ligand_pdb.to_records(index=False):
         print(ligand + "\t"+ "|".join(pdb))
     return 0
 
