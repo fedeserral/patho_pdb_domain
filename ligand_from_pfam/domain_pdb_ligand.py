@@ -67,37 +67,49 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                 pdb_pdbe=PDBe_dic[pdb_pfam_id]
                 for residues in pdb_pdbe:
                     site_residues=residues["site_residues"]
+                    
                     author_insertion_code=residues.get("author_insertion_code","None")
                     # Si el details viene vacio. me  salteo la busqueda de ese pdb
                     if residues["details"]==None or residues["details"].split(" ")[0].lower()!="binding":
                         pass
                     else:
+                        
                         #Example1: binding site for residue PO4 A 503
                         #Example2: binding site for Ligand residues SEP A 59 through GLY A 60 bound to SER A 58                        
                         #Example 1bkx: BINDING SITE FOR RESIDUE A A 351 --> uses 3
-                        try:
-                                pdb_pdbe_details=residues["details"].replace("Ligand", "").split(" ")[4]
-                        except:
-                                print(residues)
-                                raise
+                        
+                        pdb_pdbe_details=residues["details"].replace("Ligand", "").split(" ")
+                        
+                        if len(pdb_pdbe_details) < 5:
+                            print(residues["details"])
+                            continue
+
+                        else:
+                             pdb_pdbe_details = pdb_pdbe_details[4]
+                                
+                                
                         #Example 4hpu: BINDING SITE FOR CHAIN I OF CAMP-DEPENDENT PROTEIN KINASE INHIBITOR ALPHA                                               
                         #Example 4ib5: BINDING SITE FOR CHAIN F OF CK2BETA-DERIVED CYCLIC PEPTIDE
                         if residues["details"].split(" ")[3] == "CHAIN":
                             continue
-                        
-                        
+                                                
                         if len(residues["details"].split(" ")) == 11:
                         # Puede haber dos ligandos por detail. Cuando pasa eso Tomo los dos
                             two_inOneDetail=True
                             two_inOneDetail_data=residues["details"].split(" ")[8]
                         else:
                             two_inOneDetail=False
-                            
+                        
                         for site in site_residues:
                             # Tiene letras el ligando? Las saco si las hay
                             posicion_ligando=str(site["author_residue_number"])
+                            
                             posicion_ligando=int(''.join(i for i in posicion_ligando if i.isdigit()))
-                            if site["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and posicion_ligando<=pdb_pfam_position_final:
+                            
+                                                   
+                            if (site["chain_id"] == pdb_pfam_chain and posicion_ligando>=pdb_pfam_position_inicio and
+                                                   posicion_ligando<=pdb_pfam_position_final):
+                                
                                 out=[pfam,pdb_pfam_chain,str(pdb_pfam_position_inicio),str(pdb_pfam_position_final),pdb_pfam_id,pdb_pdbe_details,site["chain_id"],str(posicion_ligando),author_insertion_code]
                                 ligands_list.append(out)
 #                                 sys.stderr.write(out+"\n")
@@ -140,7 +152,7 @@ def main():
     pfams=pfam_entry_handly(args.pfam_input)
     with open(args.pdb_pfam_mapping) as pdb_pfam_handle:
         ligands = ligands_from_domain(pfams, pdb_pfam_handle)
-    print("\n".join(ligands))           
+    print(ligands.to_csv())           
     
     
 if __name__=='__main__':
