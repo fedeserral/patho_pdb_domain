@@ -81,6 +81,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                         pdb_pdbe_details=residues["details"].replace("Ligand", "").split(" ")
                         
                         if len(pdb_pdbe_details) < 5:
+                            sys.stderr.write("Warning! PDB with wrong biding site: "+pdb_pfam_id+"\n")
                             
                             continue
 
