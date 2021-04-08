@@ -1,5 +1,6 @@
 import requests
 import json
+from json import JSONDecodeError
 sources = {x.split()[0]:x.split()[1] for x in """ 1	chembl
 2	drugbank
 3	pdb
@@ -84,5 +85,10 @@ def ligands_from_pdbs(pdbs):
         pdb_to_request=pdbs[pdb_index:final]
         pdb_to_request=",".join(pdb_to_request).lower()
         response = requests.post('https://www.ebi.ac.uk/pdbe/api/pdb/entry/binding_sites/',data = pdb_to_request)
-        response_total.update(response.json())
+        try:         
+            response_total.update(response.json())
+        except JSONDecodeError:
+          print(pdb_to_request)
+          print(response.text)
+          raise 
     return response_total
