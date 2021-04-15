@@ -1,6 +1,8 @@
 import requests
 import json
 from json import JSONDecodeError
+from requests.adapters import HTTPAdapter 
+from requests.packages.urllib3.util.retry import Retry
 sources = {x.split()[0]:x.split()[1] for x in """ 1	chembl
 2	drugbank
 3	pdb
@@ -78,17 +80,41 @@ def ligands_from_pdbs(pdbs):
     pdbs_count=len(pdbs)
     response_total={}
     pdbs_per_request=100
+    retry_strategy = Retry(total=3, status_forcelist=[429, 500, 502, 503, 504], 
+                       method_whitelist=["HEAD", "GET", "OPTIONS", "POST"])
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    http = requests.Session() 
+    http.mount("https://", adapter) 
+    http.mount("http://", adapter)
     for pdb_index in range(0,pdbs_count,pdbs_per_request):
         final=pdb_index+pdbs_per_request
         if final>pdbs_count:
             final=pdbs_count
         pdb_to_request=pdbs[pdb_index:final]
         pdb_to_request=",".join(pdb_to_request).lower()
-        response = requests.post('https://www.ebi.ac.uk/pdbe/api/pdb/entry/binding_sites/',data = pdb_to_request)
-        try:         
+        response = http.post('https://www.ebi.ac.uk/pdbe/api/pdb/entry/binding_sites/',data = pdb_to_request)
+        try:
             response_total.update(response.json())
         except JSONDecodeError:
-          print(pdb_to_request)
-          print(response.text)
-          raise 
+            print(pdb_to_request)
+            print(response.text)
+            raise 
     return response_total
+#def ligands_from_pdbs(pdbs):
+#    pdbs_count=len(pdbs)
+#    response_total={}
+#    pdbs_per_request=100
+#    for pdb_index in range(0,pdbs_count,pdbs_per_request):
+#        final=pdb_index+pdbs_per_request
+#        if final>pdbs_count:
+#            final=pdbs_count
+#        pdb_to_request=pdbs[pdb_index:final]
+#        pdb_to_request=",".join(pdb_to_request).lower()
+#        response = requests.post('https://www.ebi.ac.uk/pdbe/api/pdb/entry/binding_sites/',data = pdb_to_request)
+#        try:         
+#            response_total.update(response.json())
+#        except JSONDecodeError:
+#          print(pdb_to_request)
+#          print(response.text)
+#          raise 
+#    return response_total
