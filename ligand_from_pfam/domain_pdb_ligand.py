@@ -78,7 +78,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                         #Example2: binding site for Ligand residues SEP A 59 through GLY A 60 bound to SER A 58                        
                         #Example 1bkx: BINDING SITE FOR RESIDUE A A 351 --> uses 3
                         
-                        pdb_pdbe_details=residues["details"].replace("Ligand", "").split(" ")
+                        #pdb_pdbe_details=residues["details"].replace("Ligand", "").split(" ")
                         
                         if len(pdb_pdbe_details) < 5:
                             sys.stderr.write("Warning! PDB with wrong biding site: "+pdb_pfam_id+"\n")
@@ -91,7 +91,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                                 
                         #Example 4hpu: BINDING SITE FOR CHAIN I OF CAMP-DEPENDENT PROTEIN KINASE INHIBITOR ALPHA                                               
                         #Example 4ib5: BINDING SITE FOR CHAIN F OF CK2BETA-DERIVED CYCLIC PEPTIDE
-                        if residues["details"].split(" ")[3] == "CHAIN":
+                        if residues["details"].split(" ")[3] == "CHAIN" or residues["details"].split(" ")[4] == "Ligands" or residues["details"].split(" ")[4] == "residues":
                             continue
                                                 
                         if len(residues["details"].split(" ")) == 11:
