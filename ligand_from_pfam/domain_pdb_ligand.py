@@ -78,7 +78,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                         #Example2: binding site for Ligand residues SEP A 59 through GLY A 60 bound to SER A 58                        
                         #Example 1bkx: BINDING SITE FOR RESIDUE A A 351 --> uses 3
                         
-                        #pdb_pdbe_details=residues["details"].replace("Ligand", "").split(" ")
+                        pdb_pdbe_details=residues["details"].replace("Ligand", "").split(" ")
                         
                         if len(pdb_pdbe_details) < 5:
                             sys.stderr.write("Warning! PDB with wrong biding site: "+pdb_pfam_id+"\n")
