@@ -45,8 +45,13 @@ sources = {x.split()[0]:x.split()[1] for x in """ 1	chembl
 47	rxnorm""".split("\n")}
 
 def pdb_ligand_data(ligands):
-  
-   r = requests.post("https://www.ebi.ac.uk/pdbe/api/pdb/compound/summary/",data=",".join(ligands))
+   retry_strategy = Retry(total=3, status_forcelist=[429, 500, 502, 503, 504], 
+                       method_whitelist=["HEAD", "GET", "OPTIONS", "POST"])
+   adapter = HTTPAdapter(max_retries=retry_strategy)
+   http = requests.Session() 
+   http.mount("https://", adapter) 
+   http.mount("http://", adapter)
+   r = http.post("https://www.ebi.ac.uk/pdbe/api/pdb/compound/summary/",data=",".join(ligands))
    if r.ok:
        data =  r.json()  
        new_data = []
@@ -63,7 +68,13 @@ def pdb_ligand_data(ligands):
    raise Exception(r.text)
 
 def search_chembl(chembl_id):
-   r = requests.get(f"https://www.ebi.ac.uk/unichem/rest/src_compound_id_all/{chembl_id}/1")
+   retry_strategy = Retry(total=3, status_forcelist=[429, 500, 502, 503, 504], 
+                       method_whitelist=["HEAD", "GET", "OPTIONS", "POST"])
+   adapter = HTTPAdapter(max_retries=retry_strategy)
+   http = requests.Session() 
+   http.mount("https://", adapter) 
+   http.mount("http://", adapter)
+   r = http.get(f"https://www.ebi.ac.uk/unichem/rest/src_compound_id_all/{chembl_id}/1")
    if r.ok:
        data =  r.json()
        for x in data:
