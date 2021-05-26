@@ -57,7 +57,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='Extract valid ligands from MOAD DATABASE')
     parser.add_argument("-l", '--ligands_list', default=None, help="Input file should have ligands ID list")
     parser.add_argument("-db", '--moad_database',  default="MOAD.json")
-    parser.add_argument("-f1", '--filter_aa', action="store_true")
+    parser.add_argument("-f1", '--filter_aa', action="store_false")
     parser.add_argument("-f2", '--filter_nad', action="store_true")
     parser.add_argument("-f3", '--filter_fad', action="store_true")
     parser.add_argument("-f4", '--filter_nucl', action="store_true")
