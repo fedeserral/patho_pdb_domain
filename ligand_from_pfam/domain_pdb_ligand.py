@@ -91,7 +91,7 @@ def pfam_pdb_ligand(pfam_entry, PDBe_dic, pfam_pdbs_dictionary):
                                 
                         #Example 4hpu: BINDING SITE FOR CHAIN I OF CAMP-DEPENDENT PROTEIN KINASE INHIBITOR ALPHA                                               
                         #Example 4ib5: BINDING SITE FOR CHAIN F OF CK2BETA-DERIVED CYCLIC PEPTIDE
-                        if residues["details"].split(" ")[3] == "CHAIN" or residues["details"].split(" ")[4] == "Ligands" or residues["details"].split(" ")[4] == "residues"  or residues["details"].split(" ")[4] == "RESIDUES":
+                        if residues["details"].split(" ")[3] == "CHAIN" or residues["details"].split(" ")[4] == "Ligands" or residues["details"].split(" ")[4] == "residues"  or residues["details"].split(" ")[4] == "RESIDUES" or residues["details"].split(" ")[4] == "SUC" or residues["details"].split(" ")[4] == "SUP" or residues["details"].split(" ")[4] == "TRE" or residues["details"].split(" ")[4] == "CBI":
                             continue
                                                 
                         if len(residues["details"].split(" ")) == 11:
